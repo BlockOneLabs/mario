@@ -1,5 +1,7 @@
 //IMPORTANT: Make sure to use Kaboom version 0.5.0 for this game by adding the correct script tag in the HTML file.
 
+let totalStars = 0;
+
 kaboom({
   global: true,
   fullscreen: true,
@@ -14,7 +16,7 @@ const JUMP_FORCE = 360
 const BIG_JUMP_FORCE = 550
 let CURRENT_JUMP_FORCE = JUMP_FORCE
 const FALL_DEATH = 400
-const ENEMY_SPEED = 20
+let ENEMY_SPEED
 
 // Game logic
 
@@ -22,10 +24,10 @@ let isJumping = true
 
 loadRoot('https://i.imgur.com/')
 loadSprite('coin', 'wbKxhcd.png')
-loadSprite('evil-shroom', 'KPO3fR9.png')
+loadSprite('evil-shroom', 'aQT90kG.png')
+loadSprite('player', 'ieCDWrZ.png')
 loadSprite('brick', 'pogC9x5.png')
 loadSprite('block', 'M6rwarW.png')
-loadSprite('mario', 'Wb1qfhK.png')
 loadSprite('mushroom', '0wMd92p.png')
 loadSprite('surprise', 'gesQ1KP.png')
 loadSprite('unboxed', 'bdrLpi6.png')
@@ -37,7 +39,7 @@ loadSprite('pipe-bottom-right', 'nqQ79eI.png')
 loadSprite('blue-block', 'fVscIbn.png')
 loadSprite('blue-brick', '3e5YRQd.png')
 loadSprite('blue-steel', 'gqVoI2b.png')
-loadSprite('blue-evil-shroom', 'SvV4ueD.png')
+loadSprite('blue-evil-shroom', 'DGxRvog.png')
 loadSprite('blue-surprise', 'RMqCc1G.png')
 
 
@@ -50,8 +52,6 @@ scene("game", ({ level, score }) => {
       '                                      ',
       '                                      ',
       '                                      ',
-      '                                      ',
-      '                                      ',
       '     %   =*=%=                        ',
       '                                      ',
       '                            -+        ',
@@ -59,8 +59,6 @@ scene("game", ({ level, score }) => {
       '==============================   =====',
     ],
     [
-      '£                                       £',
-      '£                                       £',
       '£                                       £',
       '£                                       £',
       '£                                       £',
@@ -105,7 +103,7 @@ scene("game", ({ level, score }) => {
     }
   ])
 
-  add([text('level ' + parseInt(level + 1) ), pos(40, 6)])
+  add([text('level ' + parseInt(level + 1) + ` total NFT stars ${totalStars}` ), pos(40, 6)])
   
   function big() {
     let timer = 0
@@ -138,7 +136,7 @@ scene("game", ({ level, score }) => {
   }
 
   const player = add([
-    sprite('mario'), solid(),
+    sprite('player'), solid(),
     pos(30, 0),
     body(),
     big(),
@@ -227,4 +225,13 @@ scene('lose', ({ score }) => {
   add([text(score, 32), origin('center'), pos(width()/2, height()/ 2)])
 })
 
-start("game", { level: 0, score: 0})
+const startGame = async () => {
+  const host = "ADD_YOUR_HOST"
+  const response = await fetch(`${host}/api/nftbalance?userId=1`)
+  const nfts = await response.json();
+  totalStars = nfts.length
+  ENEMY_SPEED = Math.max(20 - 5 * totalStars, 0) 
+  start("game", { level: 0, score: 0})
+}
+
+startGame()
