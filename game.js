@@ -192,6 +192,18 @@ scene("game", ({ level, score }) => {
 
   player.collides('pipe', () => {
     keyPress('down', () => {
+      const body = {
+        userId: 1
+      }
+      fetch("http://localhost:3000/api/nftmint",{
+        method: "POST",
+        body: JSON.stringify(body)
+      }) 
+      .then((response)=>response.json())
+      .then((responseJson)=>{
+        alert(`New level! Minting NFT: ${responseJson.txId}`)
+      });
+
       go('game', {
         level: (level + 1) % maps.length,
         score: scoreLabel.value
@@ -226,7 +238,7 @@ scene('lose', ({ score }) => {
 })
 
 const startGame = async () => {
-  const host = "ADD_YOUR_HOST"
+  const host = "http://localhost:3000"
   const response = await fetch(`${host}/api/nftbalance?userId=1`)
   const nfts = await response.json();
   totalStars = nfts.length
