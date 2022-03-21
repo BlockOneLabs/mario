@@ -1,7 +1,7 @@
 //IMPORTANT: Make sure to use Kaboom version 0.5.0 for this game by adding the correct script tag in the HTML file.
 
 let totalStars = 0;
-
+let starIdInUse;
 kaboom({
   global: true,
   fullscreen: true,
@@ -179,6 +179,7 @@ scene("game", ({ level, score }) => {
     if (isJumping) {
       destroy(d)
     } else {
+
       go('lose', { score: scoreLabel.value})
     }
   })
@@ -238,13 +239,30 @@ scene('lose', ({ score }) => {
 })
 
 const startGame = async () => {
-  // const host = "http://localhost:3000"
-  // const response = await fetch(`${host}/api/nftbalance?userId=1`)
-  // const nfts = await response.json();
-  // totalStars = nfts.length
-  // ENEMY_SPEED = Math.max(20 - 5 * totalStars, 0) 
+  const host = "http://localhost:3000"
+  const response = await fetch(`${host}/api/nftbalance?userId=1`)
+  const nfts = await response.json();
+  const validNFTs = nfts.filter(nft => {
+    console.log(`nft.attributes ${JSON.stringify(nft.attributes)}`)
+    const attributes = nft.attributes || []
+    const used = attributes.some(attr => attr.trait_type === "used" && attr.value === "true") 
+    return !used;
+  })
+  totalStars = validNFTs.length
+  ENEMY_SPEED = Math.max(20 - 5 * totalStars, 0) 
   ENEMY_SPEED = 20;
   start("game", { level: 0, score: 0})
+}
+
+const useNFT = () => {
+  fetch("http://localhost:3000/api/useNFTStar",{
+        method: "POST",
+        body: JSON.stringify(body)
+      }) 
+      .then((response)=>response.json())
+      .then((responseJson)=>{
+        alert(`New level! Minting NFT: ${responseJson.txId}`)
+      });
 }
 
 startGame()
