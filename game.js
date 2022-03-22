@@ -232,6 +232,7 @@ const startGame = async () => {
   const response = await fetch(`${host}/api/nftbalance?userId=1`)
   const nfts = await response.json();
   totalStars = nfts.length
+	ENEMY_SPEED = Math.max(20 - 2 * totalStars, 0)
   start("game", { level: 0, score: 0})
 }
 
