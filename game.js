@@ -257,10 +257,13 @@ const startGame = async () => {
 
 const useNFT = () => {
   const body = {
-    tokenId:starIdInUse
+    tokenId: starIdInUse
   }
   fetch("http://localhost:3000/api/useNFTStar",{
         method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
         body: JSON.stringify(body)
       }) 
       .then((response)=>response.json())
