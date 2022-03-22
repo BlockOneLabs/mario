@@ -1,5 +1,6 @@
 let totalStars = 0;
-const host = ${VERCEL_HOST}// or localhost
+const host = "https://platformer-demo-backend-j4hjjswoz-block-one.vercel.app"// or localhost
+let starIdInUse;
 
 kaboom({
   global: true,
@@ -178,6 +179,7 @@ scene("game", ({ level, score }) => {
     if (isJumping) {
       destroy(d)
     } else {
+      useNFT()
       go('lose', { score: scoreLabel.value})
     }
   })
@@ -185,6 +187,7 @@ scene("game", ({ level, score }) => {
   player.action(() => {
     camPos(player.pos)
     if (player.pos.y >= FALL_DEATH) {
+      useNFT()
       go('lose', { score: scoreLabel.value})
     }
   })
@@ -233,12 +236,37 @@ scene('lose', ({ score }) => {
   add([text(score, 32), origin('center'), pos(width()/2, height()/ 2)])
 })
 
+
 const startGame = async () => {
   const response = await fetch(`${host}/api/nftbalance?userId=1`)
   const nfts = await response.json();
-  totalStars = nfts.length
-	ENEMY_SPEED = Math.max(20 - 2 * totalStars, 0)
+  const validNFTs = nfts.filter(nft => {
+    const attributes = nft.attributes || []
+    const used = attributes.some(attr => attr.trait_type === "used" && attr.value === "true") 
+    return !used;
+  })
+  totalStars = validNFTs.length
+  starIdInUse = validNFTs[0]?.id;
+  ENEMY_SPEED = Math.max(20 - 5 * totalStars, 0) 
   start("game", { level: 0, score: 0})
+} 
+
+const useNFT = () => {
+  const body = {
+    tokenId: starIdInUse
+  }
+  fetch(`${host}/api/useNFTStar`,{
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(body)
+      }) 
+      .then((response)=>response.json())
+      .then((responseJson)=>{
+        alert(`Oh no you lost level! We upated an NFT image ${starIdInUse}`)
+      });
 }
+
 
 startGame()
