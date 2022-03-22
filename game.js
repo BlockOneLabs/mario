@@ -1,5 +1,4 @@
 //IMPORTANT: Make sure to use Kaboom version 0.5.0 for this game by adding the correct script tag in the HTML file.
-
 let totalStars = 0;
 
 kaboom({
@@ -16,7 +15,7 @@ const JUMP_FORCE = 360
 const BIG_JUMP_FORCE = 550
 let CURRENT_JUMP_FORCE = JUMP_FORCE
 const FALL_DEATH = 400
-let ENEMY_SPEED
+const ENEMY_SPEED =  20
 
 // Game logic
 
@@ -104,7 +103,7 @@ scene("game", ({ level, score }) => {
   ])
 
   add([text('level ' + parseInt(level + 1) + ` total NFT stars ${totalStars}` ), pos(40, 6)])
-  
+    
   function big() {
     let timer = 0
     let isBig = false
@@ -195,15 +194,6 @@ scene("game", ({ level, score }) => {
       const body = {
         userId: 1
       }
-      // fetch("http://localhost:3000/api/nftmint",{
-      //   method: "POST",
-      //   body: JSON.stringify(body)
-      // }) 
-      // .then((response)=>response.json())
-      // .then((responseJson)=>{
-      //   alert(`New level! Minting NFT: ${responseJson.txId}`)
-      // });
-
       go('game', {
         level: (level + 1) % maps.length,
         score: scoreLabel.value
@@ -238,12 +228,10 @@ scene('lose', ({ score }) => {
 })
 
 const startGame = async () => {
-  // const host = "http://localhost:3000"
-  // const response = await fetch(`${host}/api/nftbalance?userId=1`)
-  // const nfts = await response.json();
-  // totalStars = nfts.length
-  // ENEMY_SPEED = Math.max(20 - 5 * totalStars, 0) 
-  ENEMY_SPEED = 20;
+  const host = "https://platformer-demo-backend-j4hjjswoz-block-one.vercel.app" // or localhost
+  const response = await fetch(`${host}/api/nftbalance?userId=1`)
+  const nfts = await response.json();
+  totalStars = nfts.length
   start("game", { level: 0, score: 0})
 }
 
