@@ -249,6 +249,7 @@ const startGame = async () => {
     return !used;
   })
   totalStars = validNFTs.length
+  starIdInUse = validNFTs[0]?.id;
   ENEMY_SPEED = Math.max(20 - 5 * totalStars, 0) 
   ENEMY_SPEED = 20;
   start("game", { level: 0, score: 0})
@@ -261,7 +262,7 @@ const useNFT = () => {
       }) 
       .then((response)=>response.json())
       .then((responseJson)=>{
-        alert(`New level! Minting NFT: ${responseJson.txId}`)
+        alert(`Oh no you lost level! We upated an NFT image`)
       });
 }
 
