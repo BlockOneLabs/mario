@@ -1,5 +1,5 @@
-//IMPORTANT: Make sure to use Kaboom version 0.5.0 for this game by adding the correct script tag in the HTML file.
 let totalStars = 0;
+const host = ${VERCEL_HOST}// or localhost
 
 kaboom({
   global: true,
@@ -189,11 +189,17 @@ scene("game", ({ level, score }) => {
     }
   })
 
+  
   player.collides('pipe', () => {
     keyPress('down', () => {
-      const body = {
-        userId: 1
-      }
+		fetch(`${host}/api/nftmint`,{
+        method: "POST",
+        body: JSON.stringify(body)
+      }) 
+      .then((response)=>response.json())
+      .then((responseJson)=>{
+        alert(`New level! Minting NFT: ${responseJson.txId}`)
+      });
       go('game', {
         level: (level + 1) % maps.length,
         score: scoreLabel.value
@@ -228,7 +234,6 @@ scene('lose', ({ score }) => {
 })
 
 const startGame = async () => {
-  const host = "https://platformer-demo-backend-j4hjjswoz-block-one.vercel.app" // or localhost
   const response = await fetch(`${host}/api/nftbalance?userId=1`)
   const nfts = await response.json();
   totalStars = nfts.length
